@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Compras</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #F0FFFF 0%, #40E0D0 100%);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: white;
+            border-radius: 0;
+            box-shadow: none;
+            overflow: hidden;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #40E0D0 0%, #48D1CC 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .tabs {
+            display: flex;
+            background: #F0FFFF;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px 5px;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            font-weight: 600;
+            color: #20B2AA;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: white;
+            color: #40E0D0;
+        }
+
+        .content {
+            padding: 20px;
+            min-height: 400px;
+        }
+
+        .add-item-section {
+            background: #F0FFFF;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #40E0D0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #48D1CC;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #40E0D0 0%, #48D1CC 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(212, 165, 165, 0.3);
+        }
+
+        .btn-success {
+            background: #6fa86f;
+            color: white;
+            width: 100%;
+            margin-top: 15px;
+            padding: 15px;
+            font-size: 16px;
+        }
+
+        .btn-success:hover {
+            background: #5a8f5a;
+        }
+
+        .items-list {
+            list-style: none;
+        }
+
+        .item {
+            background: white;
+            border: 2px solid #F0FFFF;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .item:hover {
+            border-color: #40E0D0;
+        }
+
+        .item.picked {
+            background: #e8f5e9;
+            border-color: #6fa86f;
+        }
+
+        .item.picked .item-name {
+            text-decoration: line-through;
+            color: #6fa86f;
+        }
+
+        .item.alerta {
+            border-color: #ff9800;
+            background: #fff3e0;
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .item-quantity {
+            color: #40E0D0;
+            font-size: 14px;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .qty-controls {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+            background: #F0FFFF;
+            padding: 5px;
+            border-radius: 8px;
+        }
+
+        .qty-btn {
+            width: 30px;
+            height: 30px;
+            border: none;
+            border-radius: 6px;
+            background: #40E0D0;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .qty-btn:hover {
+            background: #48D1CC;
+            transform: scale(1.1);
+        }
+
+        .qty-display {
+            min-width: 35px;
+            text-align: center;
+            font-weight: bold;
+            color: #20B2AA;
+        }
+
+        .btn-small {
+            padding: 8px 12px;
+            font-size: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .btn-pick {
+            background: #6fa86f;
+            color: white;
+        }
+
+        .btn-unpick {
+            background: #ff9800;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #e57373;
+            color: white;
+        }
+
+        .btn-move {
+            background: #40E0D0;
+            color: white;
+        }
+
+        .btn-add-lista {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn-small:hover {
+            transform: scale(1.05);
+        }
+
+        .move-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .sync-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #6fa86f;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        .sync-indicator.syncing {
+            background: #ff9800;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .alert-badge {
+            background: #ff9800;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            margin-left: 5px;
+            font-weight: bold;
+        }
+
+        /* Toggle Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #40E0D0;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Histórico */
+        .historico-item {
+            background: white;
+            border: 2px solid #F0FFFF;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .historico-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .historico-header:hover {
+            background: #F0FFFF;
+        }
+
+        .historico-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            color: #20B2AA;
+            font-size: 16px;
+        }
+
+        .historico-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .historico-detalhes {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background: #fafafa;
+        }
+
+        .historico-detalhes.open {
+            max-height: 2000px;
+        }
+
+        .historico-detalhes-content {
+            padding: 15px;
+            border-top: 1px solid #F0FFFF;
+        }
+
+        .historico-item-produto {
+            padding: 8px 0;
+            border-bottom: 1px solid #F0FFFF;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .historico-item-produto:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛒 Lista de Compras</h1>
+            <p>Compartilhada em tempo real</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('estoque')">📦 Estoque</button>
+            <button class="tab" onclick="showTab('lembretes')">⚠️ Lembretes<span class="alert-badge" id="alert-count" style="display: none;">0</span></button>
+            <button class="tab" onclick="showTab('compras')">🛍️ Lista</button>
+            <button class="tab" onclick="showTab('historico')">📋 Histórico</button>
+        </div>
+
+        <div class="content">
+            <!-- ABA ESTOQUE -->
+            <div id="estoque-content">
+                <div class="add-item-section">
+                    <h3 style="margin-bottom: 10px; color: #20B2AA;">Adicionar Item ao Estoque</h3>
+                    <div class="input-group">
+                        <input type="text" id="estoque-item" placeholder="Nome do item">
+                        <input type="number" id="estoque-quantidade" placeholder="Qtd" style="max-width: 80px;" min="0">
+                    </div>
+                    <button class="btn btn-primary" onclick="addItemEstoque()">Adicionar ao Estoque</button>
+                </div>
+
+                <div style="background: #F0FFFF; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 20px;">🔍</span>
+                        <input type="text" id="busca-estoque" placeholder="Buscar item no estoque..." style="flex: 1; border: 2px solid #40E0D0;" oninput="buscarEstoque()">
+                    </div>
+                </div>
+
+                <ul class="items-list" id="estoque-list"></ul>
+            </div>
+
+            <!-- ABA LEMBRETES -->
+            <div id="lembretes-content" style="display: none;">
+                <div style="background: #fff3e0; padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #ff9800;">
+                    <p style="color: #20B2AA; font-size: 14px;">⚠️ Itens com quantidade baixa (0 ou 1) aparecem aqui automaticamente</p>
+                </div>
+
+                <div style="background: #F0FFFF; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 20px;">🔍</span>
+                        <input type="text" id="busca-lembretes" placeholder="Buscar item nos lembretes..." style="flex: 1; border: 2px solid #40E0D0;" oninput="buscarLembretes()">
+                    </div>
+                </div>
+
+                <ul class="items-list" id="lembretes-list"></ul>
+            </div>
+
+            <!-- ABA LISTA DE COMPRAS -->
+            <div id="compras-content" style="display: none;">
+                <div class="add-item-section">
+                    <h3 style="margin-bottom: 10px; color: #20B2AA;">Adicionar Item para Comprar</h3>
+                    <div class="input-group">
+                        <input type="text" id="compras-item" placeholder="Nome do item">
+                        <input type="number" id="compras-quantidade" placeholder="Qtd" style="max-width: 80px;" min="0" value="0">
+                    </div>
+                    <button class="btn btn-primary" onclick="addItemCompras()">Adicionar à Lista</button>
+                </div>
+
+                <div style="background: #F0FFFF; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 20px;">🔍</span>
+                        <input type="text" id="busca-compras" placeholder="Buscar item na lista..." style="flex: 1; border: 2px solid #40E0D0;" oninput="buscarCompras()">
+                    </div>
+                </div>
+
+                <div style="background: #F0FFFF; padding: 15px; border-radius: 10px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;">
+                    <span style="color: #20B2AA; font-weight: 600;">🔍 Filtrar itens para comprar</span>
+                    <label class="switch">
+                        <input type="checkbox" id="filtro-compras" onchange="toggleFiltroCompras()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <ul class="items-list" id="compras-list"></ul>
+
+                <button class="btn btn-success" onclick="finalizarCompras()" id="finalizar-btn" style="display: none;">
+                    ✓ Finalizar Compras e Adicionar ao Estoque
+                </button>
+            </div>
+
+            <!-- ABA HISTÓRICO -->
+            <div id="historico-content" style="display: none;">
+                <div style="background: #F0FFFF; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                    <p style="color: #20B2AA; font-size: 14px; margin: 0;">📋 Histórico de todas as suas compras finalizadas</p>
+                </div>
+
+                <ul class="items-list" id="historico-list"></ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="sync-indicator" id="sync-status">● Sincronizado</div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, set, onValue, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        // ============================================
+        // COLE AQUI O SEU CÓDIGO DO FIREBASE
+        // Substitua tudo entre as linhas abaixo:
+        // ============================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyDXYtqmw6VSbpQv11fsPLBwyXt4QwnbBq4",
+            authDomain: "lista-compras-irma.firebaseapp.com",
+            databaseURL: "https://lista-compras-irma-default-rtdb.firebaseio.com",
+            projectId: "lista-compras-irma",
+            storageBucket: "lista-compras-irma.firebasestorage.app",
+            messagingSenderId: "698525130283",
+            appId: "1:698525130283:web:ff6cebef125bcbaf83146e"
+        };
+        // ============================================
+        // FIM - Cole o código do Firebase acima
+        // ============================================
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        let estoque = [];
+        let compras = [];
+        let lembretesOcultos = [];
+        let historico = [];
+        let currentTab = 'estoque';
+        let filtroAtivo = false;
+        let buscaEstoque = '';
+        let buscaLembretes = '';
+        let buscaCompras = '';
+
+        // Sincronização em tempo real
+        const estoqueRef = ref(database, 'estoque');
+        const comprasRef = ref(database, 'compras');
+        const lembretesRef = ref(database, 'lembretes-ocultos');
+        const historicoRef = ref(database, 'historico');
+
+        onValue(estoqueRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                estoque = data;
+                renderEstoque();
+                renderLembretes();
+            }
+        });
+
+        onValue(comprasRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                compras = data;
+                renderCompras();
+            }
+        });
+
+        onValue(lembretesRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                lembretesOcultos = data;
+                renderLembretes();
+            }
+        });
+
+        onValue(historicoRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                historico = data;
+                renderHistorico();
+            }
+        });
+
+        function saveToFirebase() {
+            const syncStatus = document.getElementById('sync-status');
+            syncStatus.textContent = '● Sincronizando...';
+            syncStatus.classList.add('syncing');
+
+            Promise.all([
+                set(estoqueRef, estoque),
+                set(comprasRef, compras),
+                set(lembretesRef, lembretesOcultos),
+                set(historicoRef, historico)
+            ]).then(() => {
+                syncStatus.textContent = '● Sincronizado';
+                syncStatus.classList.remove('syncing');
+            }).catch((error) => {
+                syncStatus.textContent = '⚠ Erro ao sincronizar';
+                console.error('Erro:', error);
+            });
+        }
+
+        window.showTab = function(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('estoque-content').style.display = tab === 'estoque' ? 'block' : 'none';
+            document.getElementById('lembretes-content').style.display = tab === 'lembretes' ? 'block' : 'none';
+            document.getElementById('compras-content').style.display = tab === 'compras' ? 'block' : 'none';
+            document.getElementById('historico-content').style.display = tab === 'historico' ? 'block' : 'none';
+        }
+
+        window.addItemEstoque = function() {
+            const itemInput = document.getElementById('estoque-item');
+            const qtdInput = document.getElementById('estoque-quantidade');
+            
+            const nome = itemInput.value.trim();
+            const quantidade = parseInt(qtdInput.value) || 0;
+            
+            if (nome) {
+                estoque.push({
+                    id: Date.now(),
+                    nome: nome,
+                    quantidade: quantidade
+                });
+                
+                itemInput.value = '';
+                qtdInput.value = '';
+                
+                saveToFirebase();
+            }
+        }
+
+        window.addItemCompras = function() {
+            const itemInput = document.getElementById('compras-item');
+            const qtdInput = document.getElementById('compras-quantidade');
+            
+            const nome = itemInput.value.trim();
+            const quantidade = parseInt(qtdInput.value) || 0;
+            
+            if (nome) {
+                compras.push({
+                    id: Date.now(),
+                    nome: nome,
+                    quantidade: quantidade,
+                    picked: false
+                });
+                
+                itemInput.value = '';
+                qtdInput.value = '0';
+                
+                saveToFirebase();
+            }
+        }
+
+        window.addToComprasFromLembrete = function(nome, quantidade) {
+            const existe = compras.find(c => c.nome.toLowerCase() === nome.toLowerCase());
+            if (existe) {
+                existe.quantidade += quantidade;
+            } else {
+                compras.push({
+                    id: Date.now(),
+                    nome: nome,
+                    quantidade: quantidade,
+                    picked: false
+                });
+            }
+            saveToFirebase();
+            alert(`✓ "${nome}" adicionado à Lista de Compras!`);
+        }
+
+        window.ocultarLembrete = function(id) {
+            if (!lembretesOcultos.includes(id)) {
+                lembretesOcultos.push(id);
+            }
+            saveToFirebase();
+        }
+
+        window.adjustQtyEstoque = function(id, delta) {
+            const item = estoque.find(i => i.id === id);
+            if (item) {
+                item.quantidade = Math.max(0, item.quantidade + delta);
+                saveToFirebase();
+                renderEstoque();
+                renderLembretes();
+            }
+        }
+
+        window.adjustQtyCompras = function(id, delta) {
+            const item = compras.find(i => i.id === id);
+            if (item) {
+                item.quantidade = Math.max(0, item.quantidade + delta);
+                saveToFirebase();
+                renderCompras();
+            }
+        }
+
+        window.deleteItem = function(id, tipo) {
+            if (tipo === 'estoque') {
+                estoque = estoque.filter(item => item.id !== id);
+                renderEstoque();
+                renderLembretes();
+            } else {
+                compras = compras.filter(item => item.id !== id);
+                renderCompras();
+            }
+            saveToFirebase();
+        }
+
+        window.togglePicked = function(id) {
+            const item = compras.find(i => i.id === id);
+            if (item) {
+                item.picked = !item.picked;
+                saveToFirebase();
+            }
+        }
+
+        window.moveItem = function(id, direction) {
+            const index = compras.findIndex(i => i.id === id);
+            if (direction === 'up' && index > 0) {
+                [compras[index], compras[index - 1]] = [compras[index - 1], compras[index]];
+            } else if (direction === 'down' && index < compras.length - 1) {
+                [compras[index], compras[index + 1]] = [compras[index + 1], compras[index]];
+            }
+            saveToFirebase();
+        }
+
+        window.finalizarCompras = function() {
+            const itensPegos = compras.filter(item => item.picked);
+            
+            if (itensPegos.length === 0) {
+                alert('⚠️ Marque os itens que você pegou antes de finalizar!');
+                return;
+            }
+            
+            // Criar entrada no histórico
+            const dataAtual = new Date();
+            const dataFormatada = dataAtual.toLocaleDateString('pt-BR');
+            
+            const novaCompra = {
+                id: Date.now(),
+                data: dataFormatada,
+                timestamp: dataAtual.toISOString(),
+                itens: itensPegos.map(item => ({
+                    nome: item.nome,
+                    quantidade: item.quantidade
+                }))
+            };
+            
+            // Adicionar ao histórico
+            historico.push(novaCompra);
+            
+            // Adicionar ao estoque
+            itensPegos.forEach(item => {
+                const existente = estoque.find(e => e.nome.toLowerCase() === item.nome.toLowerCase());
+                if (existente) {
+                    existente.quantidade += item.quantidade;
+                } else {
+                    estoque.push({
+                        id: Date.now() + Math.random(),
+                        nome: item.nome,
+                        quantidade: item.quantidade
+                    });
+                }
+                
+                item.quantidade = 0;
+                item.picked = false;
+            });
+            
+            saveToFirebase();
+            alert('✓ Compras finalizadas! Itens adicionados ao estoque e salvos no histórico.');
+        }
+
+        window.toggleFiltroCompras = function() {
+            filtroAtivo = document.getElementById('filtro-compras').checked;
+            renderCompras();
+        }
+
+        window.buscarEstoque = function() {
+            buscaEstoque = document.getElementById('busca-estoque').value.toLowerCase();
+            renderEstoque();
+        }
+
+        window.buscarLembretes = function() {
+            buscaLembretes = document.getElementById('busca-lembretes').value.toLowerCase();
+            renderLembretes();
+        }
+
+        window.buscarCompras = function() {
+            buscaCompras = document.getElementById('busca-compras').value.toLowerCase();
+            renderCompras();
+        }
+
+        window.toggleHistorico = function(id) {
+            const detalhes = document.getElementById(`historico-${id}`);
+            if (detalhes) {
+                detalhes.classList.toggle('open');
+            }
+        }
+
+        window.deleteHistorico = function(id) {
+            if (confirm('Tem certeza que deseja excluir este histórico de compras?')) {
+                historico = historico.filter(h => h.id !== id);
+                renderHistorico();
+                saveToFirebase();
+            }
+        }
+
+        function renderEstoque() {
+            const list = document.getElementById('estoque-list');
+            
+            // Aplica busca se houver texto
+            const estoqueFiltrado = buscaEstoque 
+                ? estoque.filter(item => item.nome.toLowerCase().includes(buscaEstoque))
+                : estoque;
+            
+            if (estoque.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <p>Nenhum item no estoque ainda</p>
+                        <p style="font-size: 12px; margin-top: 10px;">Adicione itens acima para começar</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            if (estoqueFiltrado.length === 0 && buscaEstoque) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <p>🔍 Nenhum item encontrado</p>
+                        <p style="font-size: 12px; margin-top: 10px;">Tente buscar com outro termo</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            list.innerHTML = estoqueFiltrado.map(item => `
+                <li class="item">
+                    <div class="item-info">
+                        <div class="item-name">${item.nome}</div>
+                        <div class="item-quantity">Quantidade: ${item.quantidade}</div>
+                    </div>
+                    <div class="item-actions">
+                        <div class="qty-controls">
+                            <button class="qty-btn" onclick="adjustQtyEstoque(${item.id}, -1)">-</button>
+                            <span class="qty-display">${item.quantidade}</span>
+                            <button class="qty-btn" onclick="adjustQtyEstoque(${item.id}, 1)">+</button>
+                        </div>
+                        <button class="btn-small btn-delete" onclick="deleteItem(${item.id}, 'estoque')">🗑️</button>
+                    </div>
+                </li>
+            `).join('');
+        }
+
+        function renderLembretes() {
+            const list = document.getElementById('lembretes-list');
+            const alertBadge = document.getElementById('alert-count');
+            
+            const lembretes = estoque.filter(item => 
+                (item.quantidade === 0 || item.quantidade === 1) && 
+                !lembretesOcultos.includes(item.id)
+            );
+            
+            // Aplica busca se houver texto
+            const lembretesFiltrados = buscaLembretes
+                ? lembretes.filter(item => item.nome.toLowerCase().includes(buscaLembretes))
+                : lembretes;
+            
+            if (lembretes.length > 0) {
+                alertBadge.textContent = lembretes.length;
+                alertBadge.style.display = 'inline';
+            } else {
+                alertBadge.style.display = 'none';
+            }
+            
+            if (lembretes.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <p>✓ Nenhum item com quantidade baixa</p>
+                        <p style="font-size: 12px; margin-top: 10px;">Itens com 0 ou 1 unidade aparecerão aqui</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            if (lembretesFiltrados.length === 0 && buscaLembretes) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <p>🔍 Nenhum item encontrado</p>
+                        <p style="font-size: 12px; margin-top: 10px;">Tente buscar com outro termo</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            list.innerHTML = lembretesFiltrados.map(item => `
+                <li class="item alerta">
+                    <div class="item-info">
+                        <div class="item-name">⚠️ ${item.nome}</div>
+                        <div class="item-quantity">Quantidade: ${item.quantidade}</div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn-small btn-add-lista" onclick="addToComprasFromLembrete('${item.nome}', 1)">+ Lista</button>
+                        <button class="btn-small btn-delete" onclick="ocultarLembrete(${item.id})">Remover</button>
+                    </div>
+                </li>
+            `).join('');
+        }
+
+        function renderCompras() {
+            const list = document.getElementById('compras-list');
+            const finalizarBtn = document.getElementById('finalizar-btn');
+            
+            // Aplica filtro se ativo
+            let comprasFiltradas = filtroAtivo 
+                ? compras.filter(item => item.quantidade > 0)
+                : compras;
+            
+            // Aplica busca se houver texto
+            if (buscaCompras) {
+                comprasFiltradas = comprasFiltradas.filter(item => 
+                    item.nome.toLowerCase().includes(buscaCompras)
+                );
+            }
+            
+            if (compras.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <p>Lista de compras vazia</p>
+                        <p style="font-size: 12px; margin-top: 10px;">Adicione itens que precisa comprar</p>
+                    </div>
+                `;
+                finalizarBtn.style.display = 'none';
+                return;
+            }
+            
+            if (comprasFiltradas.length === 0 && buscaCompras) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <p>🔍 Nenhum item encontrado</p>
+                        <p style="font-size: 12px; margin-top: 10px;">Tente buscar com outro termo</p>
+                    </div>
+                `;
+                finalizarBtn.style.display = 'none';
+                return;
+            }
+            
+            if (comprasFiltradas.length === 0 && filtroAtivo) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <p>🔍 Nenhum item para comprar</p>
+                        <p style="font-size: 12px; margin-top: 10px;">Adicione quantidade aos itens que deseja comprar</p>
+                    </div>
+                `;
+                finalizarBtn.style.display = 'none';
+                return;
+            }
+            
+            const temItensPegos = compras.some(item => item.picked);
+            finalizarBtn.style.display = temItensPegos ? 'block' : 'none';
+            
+            list.innerHTML = comprasFiltradas.map((item) => {
+                const indexOriginal = compras.indexOf(item);
+                return `
+                <li class="item ${item.picked ? 'picked' : ''}">
+                    <div class="item-info">
+                        <div class="item-name">${item.nome}</div>
+                        <div class="item-quantity">Quantidade: ${item.quantidade}</div>
+                    </div>
+                    <div class="item-actions">
+                        <div class="move-buttons">
+                            <button class="btn-small btn-move" onclick="moveItem(${item.id}, 'up')" ${indexOriginal === 0 ? 'disabled style="opacity:0.5"' : ''}>↑</button>
+                            <button class="btn-small btn-move" onclick="moveItem(${item.id}, 'down')" ${indexOriginal === compras.length - 1 ? 'disabled style="opacity:0.5"' : ''}>↓</button>
+                        </div>
+                        <div class="qty-controls">
+                            <button class="qty-btn" onclick="adjustQtyCompras(${item.id}, -1)">-</button>
+                            <span class="qty-display">${item.quantidade}</span>
+                            <button class="qty-btn" onclick="adjustQtyCompras(${item.id}, 1)">+</button>
+                        </div>
+                        <button class="btn-small ${item.picked ? 'btn-unpick' : 'btn-pick'}" onclick="togglePicked(${item.id})">
+                            ${item.picked ? '↩️' : '✓'}
+                        </button>
+                        <button class="btn-small btn-delete" onclick="deleteItem(${item.id}, 'compras')">🗑️</button>
+                    </div>
+                </li>
+            `}).join('');
+        }
+
+        function renderHistorico() {
+            const list = document.getElementById('historico-list');
+            
+            if (historico.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <p>Nenhuma compra finalizada ainda</p>
+                        <p style="font-size: 12px; margin-top: 10px;">Quando você finalizar compras, elas aparecerão aqui</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Ordenar por data mais recente primeiro
+            const historicoOrdenado = [...historico].sort((a, b) => {
+                return new Date(b.timestamp) - new Date(a.timestamp);
+            });
+            
+            list.innerHTML = historicoOrdenado.map(compra => `
+                <li class="historico-item">
+                    <div class="historico-header" onclick="toggleHistorico(${compra.id})">
+                        <div class="historico-title">
+                            <span>📁</span>
+                            <span>${compra.data}</span>
+                        </div>
+                        <div class="historico-actions">
+                            <button class="btn-small btn-delete" onclick="event.stopPropagation(); deleteHistorico(${compra.id})">🗑️</button>
+                        </div>
+                    </div>
+                    <div class="historico-detalhes" id="historico-${compra.id}">
+                        <div class="historico-detalhes-content">
+                            ${compra.itens.map(item => `
+                                <div class="historico-item-produto">
+                                    • ${item.nome} - ${item.quantidade} ${item.quantidade === 1 ? 'unidade' : 'unidades'}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </li>
+            `).join('');
+        }
+    </script>
+</body>
+</html>
